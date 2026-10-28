@@ -1,0 +1,95 @@
+.daily {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.daily-heading {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.daily-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.daily-row {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1.4fr) 4rem 2.5rem minmax(60px, 1fr) 2.5rem;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 8px;
+  border-top: 1px solid var(--line);
+  color: var(--ink);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.3s var(--ease);
+}
+
+.daily-row:first-child {
+  border-top: none;
+}
+
+.daily-condition {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.daily-label,
+.daily-rain {
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+}
+
+.daily-rain-none {
+  opacity: 0.5;
+}
+
+.daily-temp {
+  text-align: right;
+}
+
+
+.daily-range {
+  position: relative;
+  height: 2px;
+  background: var(--line);
+  transition: height 0.3s var(--ease);
+}
+
+.daily-range-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--ink);
+  border-radius: 1px;
+}
+
+@media (hover: hover) {
+  .daily-row:hover {
+    background: color-mix(in srgb, var(--ink) 6%, transparent);
+  }
+
+  .daily-row:hover .daily-range {
+    height: 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .daily-row {
+    grid-template-columns: 3.5rem 1.5rem 3.5rem 2rem minmax(40px, 1fr) 2rem;
+    gap: 8px;
+    padding-inline: 0;
+  }
+
+  .daily-label {
+    display: none;
+  }
+}

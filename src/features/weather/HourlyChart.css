@@ -1,0 +1,42 @@
+.hourly {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.hourly-heading {
+  margin: 0 0 16px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.hourly-chart {
+  height: 220px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hourly-extreme {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+.hourly-tooltip {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  backdrop-filter: blur(6px);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .hourly-chart {
+    height: 180px;
+  }
+}

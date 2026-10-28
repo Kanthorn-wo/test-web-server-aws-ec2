@@ -1,121 +1,57 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { motion } from 'motion/react'
+import { useWeather } from './features/weather/useWeather'
+import { describeWeather } from './features/weather/weatherCode'
+import { Sky } from './features/weather/Sky'
+import { SearchBar } from './features/weather/SearchBar'
+import { CurrentWeather } from './features/weather/CurrentWeather'
+import { HourlyChart } from './features/weather/HourlyChart'
+import { DailyForecast } from './features/weather/DailyForecast'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [cityName, setCityName] = useState('Bangkok')
+  const { city, forecast, isNotFound, isError } = useWeather(cityName)
+
+  // Before data exists, fall back to a clear day sky
+  const current = forecast?.current
+  const isDay = current ? current.is_day === 1 : true
+  const { kind } = current ? describeWeather(current.weather_code, isDay) : { kind: 'clear' as const }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started Moo 2 test auto deploy</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <main className="app" data-sky={`${kind}-${isDay ? 'day' : 'night'}`}>
+      <Sky kind={kind} isDay={isDay} />
+
+      <header className="app__header">
+        <span className="app__title">พยากรณ์อากาศ</span>
+        <SearchBar onSearch={setCityName} />
+      </header>
+
+      {isNotFound && <p className="app__message">ไม่พบเมืองที่ค้นหา ลองพิมพ์ชื่ออื่น</p>}
+      {isError && <p className="app__message">โหลดข้อมูลไม่สำเร็จ ลองใหม่อีกครั้ง</p>}
+      {!isNotFound && !isError && !(city && forecast) && (
+        <p className="app__message app__message--loading">กำลังโหลดข้อมูล...</p>
+      )}
+
+      {/* Keyed by city so a new city cross-fades in */}
+      {city && forecast && !isNotFound && !isError && (
+        <motion.div
+          key={city.name}
+          className="app__content"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
         >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          <div className="app__hero">
+            <CurrentWeather city={city} current={forecast.current} />
+          </div>
+          <div className="app__details">
+            <HourlyChart hourly={forecast.hourly} currentTime={forecast.current.time} />
+            <DailyForecast daily={forecast.daily} />
+          </div>
+        </motion.div>
+      )}
+    </main>
   )
 }
 

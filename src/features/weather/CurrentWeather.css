@@ -1,0 +1,75 @@
+.current-weather {
+  display: flex;
+  flex-direction: column;
+}
+
+.current-weather__city {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.current-weather__country {
+  margin-left: 0.6em;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.current-weather__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 0;
+  color: var(--ink-soft);
+}
+
+/* The hero: huge, light, tabular numerals */
+.current-weather__temp {
+  margin: 0.1em 0 0;
+  font-size: clamp(9rem, 32vw, 18rem);
+  font-weight: 200;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.current-weather__degree {
+  margin-left: 0.04em;
+  font-weight: 100;
+  color: var(--ink-soft);
+}
+
+.current-weather__feels {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+}
+
+.current-weather__facts {
+  display: flex;
+  gap: 40px;
+  margin: 32px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.current-weather__fact dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+.current-weather__fact dd {
+  margin: 4px 0 0;
+  font-size: 1.5rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 900px) {
+  .current-weather__temp {
+    font-size: clamp(10rem, 20vw, 18rem);
+  }
+}
