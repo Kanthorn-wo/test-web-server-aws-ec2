@@ -1,13 +1,19 @@
 .search-bar {
+  position: relative;
+  /* Above the weather content, which sits in its own stacking context while it fades in */
+  z-index: 10;
+  width: min(100%, 260px);
+}
+
+.search-bar__field {
   display: flex;
   align-items: center;
-  width: min(100%, 260px);
   border-bottom: 1px solid var(--ink-soft);
   transition: border-color 0.3s var(--ease);
 }
 
-.search-bar:hover,
-.search-bar:focus-within {
+.search-bar__field:hover,
+.search-bar__field:focus-within {
   border-bottom-color: var(--ink);
 }
 
@@ -29,6 +35,11 @@
   color: var(--ink);
   font-size: 1rem;
   outline: none;
+}
+
+/* Chrome's built-in clear button is blue and ignores the sky palette */
+.search-bar__input::-webkit-search-cancel-button {
+  appearance: none;
 }
 
 .search-bar__input::placeholder {
@@ -56,7 +67,63 @@
   outline-offset: 2px;
 }
 
-/* Keep a visible focus cue on the input via the underline thickening */
-.search-bar:focus-within {
-  box-shadow: 0 1px 0 var(--ink);
+/* Focus cue: the underline grows to 3px, clearly thicker than the hover state */
+.search-bar__field:focus-within {
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+/* Suggestion list: flat panel on the sky color, no glass or heavy shadow */
+.search-bar__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(320px, calc(100vw - 2 * var(--gutter)));
+  border: 1px solid var(--line);
+  background: var(--sky-bottom);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--ink) 16%, transparent);
+}
+
+.search-bar__dropdown ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-bar__option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease);
+}
+
+.search-bar__option + .search-bar__option {
+  border-top: 1px solid var(--line);
+}
+
+.search-bar__option[aria-selected='true'] {
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+@media (hover: hover) {
+  .search-bar__option:hover {
+    background: color-mix(in srgb, var(--ink) 10%, transparent);
+  }
+}
+
+.search-bar__city {
+  font-size: 1rem;
+}
+
+.search-bar__place {
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+.search-bar__status {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 0.9375rem;
+  color: var(--ink-soft);
 }

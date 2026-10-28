@@ -16,7 +16,7 @@
 
 .app__title {
   font-size: 0.875rem;
-  letter-spacing: 0.08em;
+  white-space: nowrap;
   color: var(--ink-soft);
 }
 
@@ -24,6 +24,24 @@
   margin: 96px 0;
   font-size: 1.25rem;
   font-weight: 300;
+}
+
+.app__message p {
+  margin: 0 0 12px;
+}
+
+.app__retry {
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink-soft);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease);
+}
+
+.app__retry:hover,
+.app__retry:focus-visible {
+  border-bottom-color: var(--ink);
 }
 
 .app__message--loading {

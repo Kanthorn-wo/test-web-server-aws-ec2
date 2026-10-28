@@ -3,9 +3,14 @@ import type { Forecast } from './api'
 import { describeWeather } from './weatherCode'
 import './DailyForecast.css'
 
+// Index matches Date.getUTCDay() (0 is Sunday)
+const WEEKDAYS_TH = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.']
+
+const isNumber = (value: number | null): value is number => value !== null
+
 export function DailyForecast({ daily }: { daily: Forecast['daily'] }) {
-  const weekMin = Math.min(...daily.temperature_2m_min)
-  const weekMax = Math.max(...daily.temperature_2m_max)
+  const weekMin = Math.min(...daily.temperature_2m_min.filter(isNumber))
+  const weekMax = Math.max(...daily.temperature_2m_max.filter(isNumber))
   const weekSpan = weekMax - weekMin || 1
 
   return (
@@ -17,7 +22,9 @@ export function DailyForecast({ daily }: { daily: Forecast['daily'] }) {
           const min = daily.temperature_2m_min[i]
           const max = daily.temperature_2m_max[i]
           const rain = daily.precipitation_probability_max[i]
-          const weekday = i === 0 ? 'วันนี้' : new Date(date).toLocaleDateString('th-TH', { weekday: 'short' })
+          // Dates are already local to the city, so read the weekday from the date itself (UTC),
+          // not from the viewer's timezone, which could shift it by one day
+          const weekday = i === 0 ? 'วันนี้' : WEEKDAYS_TH[new Date(`${date}T00:00:00Z`).getUTCDay()]
 
           return (
             <motion.li
@@ -32,18 +39,20 @@ export function DailyForecast({ daily }: { daily: Forecast['daily'] }) {
                 <Icon size={18} strokeWidth={1.5} aria-hidden="true" />
                 <span className="daily-label">{label}</span>
               </span>
-              <span className={rain === 0 ? 'daily-rain daily-rain-none' : 'daily-rain'}>ฝน {rain}%</span>
-              <span className="daily-temp">{Math.round(min)}°</span>
+              <span className="daily-rain">ฝน {rain === null ? '-' : `${rain}%`}</span>
+              <span className="daily-temp">{min === null ? '-' : `${Math.round(min)}°`}</span>
               <span className="daily-range" aria-hidden="true">
-                <span
-                  className="daily-range-fill"
-                  style={{
-                    left: `${((min - weekMin) / weekSpan) * 100}%`,
-                    width: `${((max - min) / weekSpan) * 100}%`,
-                  }}
-                />
+                {min !== null && max !== null && (
+                  <span
+                    className="daily-range-fill"
+                    style={{
+                      left: `${((min - weekMin) / weekSpan) * 100}%`,
+                      width: `${((max - min) / weekSpan) * 100}%`,
+                    }}
+                  />
+                )}
               </span>
-              <span className="daily-temp">{Math.round(max)}°</span>
+              <span className="daily-temp">{max === null ? '-' : `${Math.round(max)}°`}</span>
             </motion.li>
           )
         })}

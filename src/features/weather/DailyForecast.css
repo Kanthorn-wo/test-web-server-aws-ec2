@@ -5,10 +5,8 @@
 
 .daily-heading {
   margin: 0 0 8px;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--ink-soft);
 }
 
@@ -20,7 +18,7 @@
 
 .daily-row {
   display: grid;
-  grid-template-columns: 4.5rem minmax(0, 1.4fr) 4rem 2.5rem minmax(60px, 1fr) 2.5rem;
+  grid-template-columns: 4.5rem minmax(0, 1.4fr) 4rem 2.5rem minmax(0, 1fr) 2.5rem;
   align-items: center;
   gap: 12px;
   padding: 14px 8px;
@@ -48,14 +46,9 @@
   font-size: 0.875rem;
 }
 
-.daily-rain-none {
-  opacity: 0.5;
-}
-
 .daily-temp {
   text-align: right;
 }
-
 
 .daily-range {
   position: relative;
@@ -84,7 +77,8 @@
 
 @media (max-width: 600px) {
   .daily-row {
-    grid-template-columns: 3.5rem 1.5rem 3.5rem 2rem minmax(40px, 1fr) 2rem;
+    /* minmax(0, 1fr) lets the range bar shrink to nothing instead of overflowing when text is zoomed */
+    grid-template-columns: 3.5rem 1.5rem 3.5rem 2rem minmax(0, 1fr) 2rem;
     gap: 8px;
     padding-inline: 0;
   }

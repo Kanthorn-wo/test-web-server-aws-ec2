@@ -40,11 +40,13 @@ input {
 }
 
 /* !important is intentional: users who ask the OS for less motion must win over
-   every component-level transition/animation without touching each file */
+   every component-level transition/animation without touching each file.
+   Iteration count 1 matters: an "infinite" animation with a ~0ms duration would flicker */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
+    animation-iteration-count: 1 !important;
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }

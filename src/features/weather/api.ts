@@ -2,6 +2,8 @@
 
 export interface City {
   name: string
+  // Province or state, used to tell apart cities with the same name
+  region: string
   country: string
   latitude: number
   longitude: number
@@ -17,36 +19,37 @@ export interface Forecast {
     wind_speed_10m: number
     is_day: number
   }
+  // Open-Meteo returns null for values it does not have (rain probability is missing in some regions)
   hourly: {
     time: string[]
-    temperature_2m: number[]
-    precipitation_probability: number[]
+    temperature_2m: (number | null)[]
+    precipitation_probability: (number | null)[]
   }
   daily: {
     time: string[]
     weather_code: number[]
-    temperature_2m_max: number[]
-    temperature_2m_min: number[]
-    precipitation_probability_max: number[]
+    temperature_2m_max: (number | null)[]
+    temperature_2m_min: (number | null)[]
+    precipitation_probability_max: (number | null)[]
   }
 }
 
-// Returns null when no city matches the name
-export async function searchCity(name: string): Promise<City | null> {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=th`
+// Up to 5 cities matching the typed name (empty array when nothing matches)
+export async function searchCities(name: string): Promise<City[]> {
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=5&language=th`
   const response = await fetch(url)
   if (!response.ok) throw new Error('geocoding request failed')
 
   const data = await response.json()
-  const match = data.results?.[0]
-  if (!match) return null
+  const matches: Record<string, string | number>[] = data.results ?? []
 
-  return {
-    name: match.name,
-    country: match.country ?? '',
-    latitude: match.latitude,
-    longitude: match.longitude,
-  }
+  return matches.map((match) => ({
+    name: String(match.name),
+    region: String(match.admin1 ?? ''),
+    country: String(match.country ?? ''),
+    latitude: Number(match.latitude),
+    longitude: Number(match.longitude),
+  }))
 }
 
 export async function fetchForecast(city: City): Promise<Forecast> {

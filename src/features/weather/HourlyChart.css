@@ -5,21 +5,26 @@
 
 .hourly-heading {
   margin: 0 0 16px;
-  font-size: 0.75rem;
+  font-size: 0.875rem;
   font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--ink-soft);
 }
 
 .hourly-chart {
   height: 220px;
   font-variant-numeric: tabular-nums;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Tapping the chart focuses an inner SVG node, which browsers outline in their own color.
+   The chart has no keyboard function (see the aria-label summary), so the ring is not needed */
+.hourly-chart :focus {
+  outline: none;
 }
 
 .hourly-extreme {
   fill: var(--ink);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 300;
   font-variant-numeric: tabular-nums;
 }
