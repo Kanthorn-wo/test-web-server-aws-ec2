@@ -1,10 +1,11 @@
 #!/bin/sh
 # Rebuild the image and restart the container.
-# Usage: ./build.sh
+# Usage: ./build.sh            (host port 8080)
+#        HOST_PORT=80 ./build.sh   (override host port, e.g. on EC2)
 
 IMAGE_NAME="vite-react"
 CONTAINER_NAME="vite-react-ts"
-HOST_PORT=8080
+HOST_PORT="${HOST_PORT:-8080}"
 
 # Stop on first error
 set -e
