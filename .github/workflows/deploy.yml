@@ -1,19 +1,38 @@
+# Workflow name shown in the "Actions" tab on GitHub
 name: Deploy to EC2
 
+# Trigger: run this workflow every time code is pushed to the main branch
 on:
   push:
     branches: [main]
 
 jobs:
+  # Job id (any name). A workflow can have several jobs; here we only need one
   deploy:
+    # GitHub provides a temporary Ubuntu machine (the "runner") to run the steps below
     runs-on: ubuntu-latest
     steps:
+      # Step label shown in the Actions log
       - name: Pull latest code and rebuild on EC2
+        # Pass secrets in as environment variables.
+        # Secrets are set in repo Settings > Secrets and variables > Actions and are masked in logs
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        # Shell commands that run on the runner (not on EC2)
         run: |
+          # Create an empty key.pem that only the owner can read/write (mode 600) BEFORE writing the key into it,
+          # so the private key is never briefly readable by other users
           install -m 600 /dev/null key.pem
+          # Write the private key from the secret into key.pem (printf '%s\n' keeps the line breaks intact)
           printf '%s\n' "$EC2_SSH_KEY" > key.pem
+          # SSH into EC2 and run the quoted command there:
+          #   -o StrictHostKeyChecking=accept-new  accept the server fingerprint on first connect without prompting
+          #   -i key.pem                           log in with the private key instead of a password
+          #   ec2-user@"$EC2_HOST"                 default Amazon Linux user @ the EC2 public IP
+          # The command inside quotes runs on EC2:
+          #   cd ~/test-web-server-aws-ec2         go to the cloned repo folder
+          #   git pull                             fetch the latest code from GitHub
+          #   HOST_PORT=80 sh build.sh             rebuild the image and restart the container on port 80
           ssh -o StrictHostKeyChecking=accept-new -i key.pem ec2-user@"$EC2_HOST" \
             'cd ~/test-web-server-aws-ec2 && git pull && HOST_PORT=80 sh build.sh'
