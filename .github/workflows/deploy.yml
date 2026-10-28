@@ -16,4 +16,4 @@ jobs:
           install -m 600 /dev/null key.pem
           printf '%s\n' "$EC2_SSH_KEY" > key.pem
           ssh -o StrictHostKeyChecking=accept-new -i key.pem ec2-user@"$EC2_HOST" \
-            'cd ~/app && git pull && HOST_PORT=80 sh build.sh'
+            'cd ~/test-web-server-aws-ec2 && git pull && HOST_PORT=80 sh build.sh'
