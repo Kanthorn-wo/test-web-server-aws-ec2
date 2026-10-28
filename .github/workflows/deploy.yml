@@ -1,38 +1,38 @@
-# Workflow name shown in the "Actions" tab on GitHub
+# ชื่อ workflow ที่แสดงในแท็บ "Actions" บน GitHub
 name: Deploy to EC2
 
-# Trigger: run this workflow every time code is pushed to the main branch
+# ตัวทริกเกอร์: ให้ทำงานทุกครั้งที่ push โค้ดเข้า branch main
 on:
   push:
     branches: [main]
 
 jobs:
-  # Job id (any name). A workflow can have several jobs; here we only need one
+  # ชื่อ job (ตั้งอะไรก็ได้) หนึ่ง workflow มีได้หลาย job แต่ที่นี่ใช้แค่ตัวเดียว
   deploy:
-    # GitHub provides a temporary Ubuntu machine (the "runner") to run the steps below
+    # GitHub จะให้เครื่อง Ubuntu ชั่วคราว (เรียกว่า runner) มารันขั้นตอนด้านล่าง
     runs-on: ubuntu-latest
     steps:
-      # Step label shown in the Actions log
+      # ชื่อขั้นตอนที่แสดงใน log ของ Actions
       - name: Pull latest code and rebuild on EC2
-        # Pass secrets in as environment variables.
-        # Secrets are set in repo Settings > Secrets and variables > Actions and are masked in logs
+        # ส่งค่า secret เข้ามาเป็น environment variable
+        # secret ตั้งที่ repo > Settings > Secrets and variables > Actions และจะถูกซ่อนค่าใน log
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-        # Shell commands that run on the runner (not on EC2)
+        # คำสั่ง shell ที่รันบน runner (ไม่ใช่รันบน EC2)
         run: |
-          # Create an empty key.pem that only the owner can read/write (mode 600) BEFORE writing the key into it,
-          # so the private key is never briefly readable by other users
+          # สร้างไฟล์ key.pem เปล่าที่เจ้าของอ่าน/เขียนได้คนเดียว (mode 600) ก่อนจะเขียน key ลงไป
+          # เพื่อให้ private key ไม่เคยอยู่ในสภาพที่คนอื่นอ่านได้ แม้เพียงชั่วครู่
           install -m 600 /dev/null key.pem
-          # Write the private key from the secret into key.pem (printf '%s\n' keeps the line breaks intact)
+          # เขียน private key จาก secret ลงไฟล์ key.pem (printf '%s\n' ช่วยให้การขึ้นบรรทัดใหม่ครบถ้วน)
           printf '%s\n' "$EC2_SSH_KEY" > key.pem
-          # SSH into EC2 and run the quoted command there:
-          #   -o StrictHostKeyChecking=accept-new  accept the server fingerprint on first connect without prompting
-          #   -i key.pem                           log in with the private key instead of a password
-          #   ec2-user@"$EC2_HOST"                 default Amazon Linux user @ the EC2 public IP
-          # The command inside quotes runs on EC2:
-          #   cd ~/test-web-server-aws-ec2         go to the cloned repo folder
-          #   git pull                             fetch the latest code from GitHub
-          #   HOST_PORT=80 sh build.sh             rebuild the image and restart the container on port 80
+          # SSH เข้า EC2 แล้วรันคำสั่งในเครื่องหมายคำพูดบนเครื่องนั้น:
+          #   -o StrictHostKeyChecking=accept-new  รับ fingerprint ของ server ครั้งแรกโดยไม่ถามยืนยัน (ไม่งั้น workflow จะค้างรอคนตอบ)
+          #   -i key.pem                           ล็อกอินด้วยไฟล์กุญแจ แทนการใช้รหัสผ่าน
+          #   ec2-user@"$EC2_HOST"                 ผู้ใช้เริ่มต้นของ Amazon Linux @ IP สาธารณะของ EC2
+          # คำสั่งในเครื่องหมายคำพูดจะรันบน EC2:
+          #   cd ~/test-web-server-aws-ec2         เข้าโฟลเดอร์โค้ดที่ clone ไว้
+          #   git pull                             ดึงโค้ดล่าสุดจาก GitHub
+          #   HOST_PORT=80 sh build.sh             build image ใหม่และรีสตาร์ท container ที่ port 80
           ssh -o StrictHostKeyChecking=accept-new -i key.pem ec2-user@"$EC2_HOST" \
             'cd ~/test-web-server-aws-ec2 && git pull && HOST_PORT=80 sh build.sh'
